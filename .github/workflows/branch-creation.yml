@@ -1,0 +1,53 @@
+name: Create Branch on New CCB Issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create_branch:
+    if: contains(github.event.issue.labels.*.name, 'ccb-pending')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: read
+
+    steps:
+      - name: Checkout repository from current branch
+        uses: actions/checkout@v4
+        with:
+          # This ensures the action checks out the branch where the workflow file exists
+          ref: ${{ github.ref }}
+
+      - name: Extract Feature Name from Issue
+        id: extract_name
+        run: |
+          BODY="${{ github.event.issue.body }}"
+          
+          # Extracts text after the ### Feature Name/Topic header
+          FEATURE_NAME=$(echo "$BODY" | sed -n '/### Feature Name\/Topic/{n;p;}' | xargs)
+          
+          # Sanitize: Replace spaces/special characters with underscores
+          # Also convert to lowercase for standard git naming conventions
+          SAFE_NAME=$(echo "ISSUE_${FEATURE_NAME}" | sed 's/[^a-zA-Z0-9]/_/g' | tr '[:upper:]' '[:lower:]')
+          
+          echo "branch_name=$SAFE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Create and Push Branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_NAME: ${{ steps.extract_name.outputs.branch_name }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create the new branch based on the current checked-out ref
+          git checkout -b "$BRANCH_NAME"
+          
+          # Create a markdown file containing the CCB details
+          # Saving it as .md since GitHub issue forms are submitted as Markdown
+          echo "${{ github.event.issue.body }}" > "ccb_request_${{ github.event.issue.number }}.md"
+          
+          git add .
+          git commit -m "docs: auto-generate CCB proposal from issue #${{ github.event.issue.number }}"
+          git push origin "$BRANCH_NAME"
