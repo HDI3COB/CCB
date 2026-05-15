@@ -1,5 +1,5 @@
-name: Change Control Board (CCB) Request 
-description: Propose a change .
+name: Change Control Board (CCB) Request
+description: Propose a change.
 title: "[CCB]: "
 labels: ["ccb-pending"]
 body:
@@ -82,14 +82,12 @@ body:
       label: Decision & Rationale
     validations:
       required: true
-      
+
   - type: textarea
     id: additional_information
     attributes:
       label: Additional Information
       placeholder: "Enter any limitation, assumptions etc..."
-    validations:
-      required: true
 
   - type: input
     id: presenters
