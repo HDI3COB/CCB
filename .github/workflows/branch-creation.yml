@@ -2,23 +2,18 @@ name: Create Branch on New CCB Issue
 
 on:
   issues:
-    # Opened catches the initial creation; labeled is the backup for race conditions.
-    types: [opened, labeled]
+    types: [opened]
 
 jobs:
   create_branch:
-    # Filter for the correct label immediately
-    if: contains(github.event.issue.labels.*.name, 'ccb-pending')
+    # Trigger ONLY if the title starts with [CCB]:
+    if: startsWith(github.event.issue.title, '[CCB]:')
     runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: read
 
     steps:
-      - name: Buffer for Label Sync
-        # Adding the 1-second delay you requested to allow metadata to settle
-        run: sleep 1
-
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -29,7 +24,7 @@ jobs:
         run: |
           BODY="${{ github.event.issue.body }}"
           
-          # Extracts the line following the 'Feature Name/Topic' header
+          # Extracts the line after 'Feature Name/Topic'
           FEATURE_NAME=$(echo "$BODY" | grep -A 1 "Feature Name/Topic" | tail -n 1 | xargs)
           
           # Fallback to issue number if empty
@@ -37,7 +32,7 @@ jobs:
             FEATURE_NAME="req-${{ github.event.issue.number }}"
           fi
 
-          # Sanitize for git branch naming
+          # Sanitize for branch naming
           SAFE_NAME=$(echo "ISSUE_${FEATURE_NAME}" | sed 's/[^a-zA-Z0-9]/_/g')
           echo "branch_name=$SAFE_NAME" >> $GITHUB_OUTPUT
 
@@ -47,19 +42,10 @@ jobs:
           BRANCH_NAME: ${{ steps.extract_name.outputs.branch_name }}
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "github-actions[bot]".noreply.github.com
           
-          git fetch origin
-          
-          # Logic to exit gracefully if the branch was already created by the 'opened' trigger
-          if git ls-remote --exit-code --heads origin "$BRANCH_NAME"; then
-            echo "Branch $BRANCH_NAME already exists. Skipping."
-            exit 0
-          fi
-          
+          # Create branch and save the issue content
           git checkout -b "$BRANCH_NAME"
-          
-          # Save issue body as a file in the new branch
           echo "${{ github.event.issue.body }}" > "ccb_request_${{ github.event.issue.number }}.md"
           
           git add .
