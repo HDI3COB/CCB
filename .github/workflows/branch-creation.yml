@@ -2,11 +2,12 @@ name: Create Branch on New CCB Issue
 
 on:
   issues:
-    types: [opened]
+    # Triggering on labeled is the safest way to ensure the label check passes
+    types: [opened, labeled]
 
 jobs:
   create_branch:
-    # Double-check label matches exactly what is in the template
+    # This checks if the issue HAS the label, regardless of which event fired
     if: contains(github.event.issue.labels.*.name, 'ccb-pending')
     runs-on: ubuntu-latest
     permissions:
@@ -17,36 +18,40 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }} # Check out the branch where this workflow exists
+          # Ensure we are on the branch where the automation is defined
+          ref: ${{ github.ref }}
 
       - name: Extract Feature Name
         id: extract_name
         run: |
           BODY="${{ github.event.issue.body }}"
           
-          # Extracts the line after the 'Feature Name/Topic' heading
-          # GitHub Issue Forms turn the input label into a ### H3 heading
-          FEATURE_NAME=$(echo "$BODY" | sed -n '/### Feature Name\/Topic/{n;p;}' | xargs)
+          # More robust extraction: find the line AFTER the Feature Name header
+          # This handles variations in whitespace or line endings
+          FEATURE_NAME=$(echo "$BODY" | grep -A 1 "Feature Name/Topic" | tail -n 1 | xargs)
           
-          # If name is empty, fallback to issue number to prevent failure
-          if [ -z "$FEATURE_NAME" ]; then
-            FEATURE_NAME="issue-${{ github.event.issue.number }}"
+          # Fallback if extraction fails
+          if [ -z "$FEATURE_NAME" ] || [ "$FEATURE_NAME" == "--" ]; then
+            FEATURE_NAME="req-${{ github.event.issue.number }}"
           fi
 
-          # Sanitize for branch naming (no spaces or special chars)
+          # Sanitize: No spaces, only alphanumeric and underscores
           SAFE_NAME=$(echo "ISSUE_${FEATURE_NAME}" | sed 's/[^a-zA-Z0-9]/_/g')
           echo "branch_name=$SAFE_NAME" >> $GITHUB_OUTPUT
 
       - name: Create and Push Branch
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ steps.extract_name.outputs.branch_name }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          git checkout -b "$BRANCH_NAME"
+          # Fetch all to ensure we have the base branch locally
+          git fetch origin
           
-          # Save the issue content as a file in the new branch
+          # Create branch and save the issue content
+          git checkout -b "$BRANCH_NAME"
           echo "${{ github.event.issue.body }}" > "ccb_request_${{ github.event.issue.number }}.md"
           
           git add .
