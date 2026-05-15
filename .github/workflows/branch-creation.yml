@@ -6,7 +6,6 @@ on:
 
 jobs:
   create_branch:
-    # Trigger ONLY if the title starts with [CCB]:
     if: startsWith(github.event.issue.title, '[CCB]:')
     runs-on: ubuntu-latest
     permissions:
@@ -23,16 +22,14 @@ jobs:
         id: extract_name
         run: |
           BODY="${{ github.event.issue.body }}"
-          
-          # Extracts the line after 'Feature Name/Topic'
+        
           FEATURE_NAME=$(echo "$BODY" | grep -A 1 "Feature Name/Topic" | tail -n 1 | xargs)
           
-          # Fallback to issue number if empty
           if [ -z "$FEATURE_NAME" ] || [ "$FEATURE_NAME" == "--" ]; then
             FEATURE_NAME="req-${{ github.event.issue.number }}"
           fi
 
-          # Sanitize for branch naming
+          
           SAFE_NAME=$(echo "ISSUE_${FEATURE_NAME}" | sed 's/[^a-zA-Z0-9]/_/g')
           echo "branch_name=$SAFE_NAME" >> $GITHUB_OUTPUT
 
