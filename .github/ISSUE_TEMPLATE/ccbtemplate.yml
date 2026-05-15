@@ -1,5 +1,5 @@
-name: Change Control Board (CCB) Request 2
-description: Propose a change with up to 3 design proposals using consolidated templates.
+name: Change Control Board (CCB) Request 
+description: Propose a change .
 title: "[CCB]: "
 labels: ["ccb-pending"]
 body:
@@ -80,26 +80,35 @@ body:
     id: decision
     attributes:
       label: Decision & Rationale
-      placeholder: "Give NA if empty"
+    validations:
+      required: true
       
   - type: textarea
     id: additional_information
     attributes:
       label: Additional Information
       placeholder: "Enter any limitation, assumptions etc..."
+    validations:
+      required: true
 
   - type: input
     id: presenters
     attributes:
       label: Presenters
+    validations:
+      required: true
 
   - type: input
     id: participants
     attributes:
       label: Participants
+    validations:
+      required: true
 
   - type: input
     id: date
     attributes:
       label: Date
       placeholder: "YYYY-MM-DD"
+    validations:
+      required: true
