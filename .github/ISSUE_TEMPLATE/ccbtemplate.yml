@@ -82,11 +82,11 @@ body:
       label: Decision & Rationale
       placeholder: "Give NA if empty"
 
-  -type: textarea
-   id: Additional Information
-   attributes:
-       label: Additional Information
-       placeholder: "Enter any limitation,assumptions etc..."
+  - type: textarea
+    id: additional_information
+    attributes:
+      label: Additional Information
+      placeholder: "Enter any limitation, assumptions etc..."
 
   - type: input
     id: presenters
