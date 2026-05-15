@@ -2,21 +2,22 @@ name: Create Branch on New CCB Issue
 
 on:
   issues:
+    # Opened catches the initial creation; labeled is the backup for race conditions.
     types: [opened, labeled]
 
 jobs:
   create_branch:
-    # We still check the label here to prevent unnecessary runner minutes
-    if: contains(github.event.issue.labels.*.name, 'ccb-pending') || github.event.label.name == 'ccb-pending'
+    # Filter for the correct label immediately
+    if: contains(github.event.issue.labels.*.name, 'ccb-pending')
     runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: read
 
     steps:
-      - name: Wait for GitHub Metadata
-        # This gives GitHub 5 seconds to finish processing the issue template labels
-        run: sleep 5
+      - name: Buffer for Label Sync
+        # Adding the 1-second delay you requested to allow metadata to settle
+        run: sleep 1
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,10 +32,12 @@ jobs:
           # Extracts the line following the 'Feature Name/Topic' header
           FEATURE_NAME=$(echo "$BODY" | grep -A 1 "Feature Name/Topic" | tail -n 1 | xargs)
           
+          # Fallback to issue number if empty
           if [ -z "$FEATURE_NAME" ] || [ "$FEATURE_NAME" == "--" ]; then
             FEATURE_NAME="req-${{ github.event.issue.number }}"
           fi
 
+          # Sanitize for git branch naming
           SAFE_NAME=$(echo "ISSUE_${FEATURE_NAME}" | sed 's/[^a-zA-Z0-9]/_/g')
           echo "branch_name=$SAFE_NAME" >> $GITHUB_OUTPUT
 
@@ -48,13 +51,15 @@ jobs:
           
           git fetch origin
           
-          # Safety check to avoid duplicate branch errors
+          # Logic to exit gracefully if the branch was already created by the 'opened' trigger
           if git ls-remote --exit-code --heads origin "$BRANCH_NAME"; then
-            echo "Branch $BRANCH_NAME already exists. Exiting."
+            echo "Branch $BRANCH_NAME already exists. Skipping."
             exit 0
           fi
           
           git checkout -b "$BRANCH_NAME"
+          
+          # Save issue body as a file in the new branch
           echo "${{ github.event.issue.body }}" > "ccb_request_${{ github.event.issue.number }}.md"
           
           git add .
