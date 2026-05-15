@@ -2,16 +2,22 @@ name: Create Branch on New CCB Issue
 
 on:
   issues:
-    types: [opened]
+    types: [opened, labeled]
 
 jobs:
   create_branch:
+    # We still check the label here to prevent unnecessary runner minutes
+    if: contains(github.event.issue.labels.*.name, 'ccb-pending') || github.event.label.name == 'ccb-pending'
     runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: read
 
     steps:
+      - name: Wait for GitHub Metadata
+        # This gives GitHub 5 seconds to finish processing the issue template labels
+        run: sleep 5
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -20,18 +26,15 @@ jobs:
       - name: Extract Feature Name
         id: extract_name
         run: |
-          # Grabbing the raw body
           BODY="${{ github.event.issue.body }}"
           
-          # Simplified extraction: find line after 'Feature Name/Topic'
+          # Extracts the line following the 'Feature Name/Topic' header
           FEATURE_NAME=$(echo "$BODY" | grep -A 1 "Feature Name/Topic" | tail -n 1 | xargs)
           
-          # Default if empty
           if [ -z "$FEATURE_NAME" ] || [ "$FEATURE_NAME" == "--" ]; then
-            FEATURE_NAME="id-${{ github.event.issue.number }}"
+            FEATURE_NAME="req-${{ github.event.issue.number }}"
           fi
 
-          # Sanitize
           SAFE_NAME=$(echo "ISSUE_${FEATURE_NAME}" | sed 's/[^a-zA-Z0-9]/_/g')
           echo "branch_name=$SAFE_NAME" >> $GITHUB_OUTPUT
 
@@ -42,6 +45,14 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git fetch origin
+          
+          # Safety check to avoid duplicate branch errors
+          if git ls-remote --exit-code --heads origin "$BRANCH_NAME"; then
+            echo "Branch $BRANCH_NAME already exists. Exiting."
+            exit 0
+          fi
           
           git checkout -b "$BRANCH_NAME"
           echo "${{ github.event.issue.body }}" > "ccb_request_${{ github.event.issue.number }}.md"
