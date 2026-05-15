@@ -81,7 +81,7 @@ body:
     attributes:
       label: Decision & Rationale
       placeholder: "Give NA if empty"
-
+      
   - type: textarea
     id: additional_information
     attributes:
