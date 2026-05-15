@@ -2,14 +2,10 @@ name: Create Branch on New CCB Issue
 
 on:
   issues:
-    # Adding 'labeled' ensures the script runs even if the label 
-    # is applied a split second after the issue is opened.
-    types: [opened, labeled]
+    types: [opened]
 
 jobs:
   create_branch:
-    # This checks if the issue HAS the label 'ccb-pending'
-    if: contains(github.event.issue.labels.*.name, 'ccb-pending')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,23 +15,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # Explicitly using main as your base
           ref: main
 
       - name: Extract Feature Name
         id: extract_name
         run: |
+          # Grabbing the raw body
           BODY="${{ github.event.issue.body }}"
           
-          # Extracts the line following the 'Feature Name/Topic' header
+          # Simplified extraction: find line after 'Feature Name/Topic'
           FEATURE_NAME=$(echo "$BODY" | grep -A 1 "Feature Name/Topic" | tail -n 1 | xargs)
           
-          # Fallback to issue number if the name extraction fails
+          # Default if empty
           if [ -z "$FEATURE_NAME" ] || [ "$FEATURE_NAME" == "--" ]; then
-            FEATURE_NAME="req-${{ github.event.issue.number }}"
+            FEATURE_NAME="id-${{ github.event.issue.number }}"
           fi
 
-          # Sanitize: Replace spaces and special characters with underscores
+          # Sanitize
           SAFE_NAME=$(echo "ISSUE_${FEATURE_NAME}" | sed 's/[^a-zA-Z0-9]/_/g')
           echo "branch_name=$SAFE_NAME" >> $GITHUB_OUTPUT
 
@@ -47,10 +43,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Create the new branch
           git checkout -b "$BRANCH_NAME"
-          
-          # Save the issue body to a markdown file in the new branch
           echo "${{ github.event.issue.body }}" > "ccb_request_${{ github.event.issue.number }}.md"
           
           git add .
