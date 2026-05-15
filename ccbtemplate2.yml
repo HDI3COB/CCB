@@ -1,0 +1,147 @@
+name: Change Control Board (CCB) Request 2
+description: Propose a change with up to 3 design proposals using consolidated templates.
+title: "[CCB]: "
+labels: ["ccb-pending"]
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: Change Category
+      description: Categorise the change as Method change or a Feature Change.
+      options:
+        - Method Change
+        - Feature Change
+    validations:
+      required: true
+
+  - type: input
+    id: feature_name
+    attributes:
+      label: Feature Name/Topic
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem_description
+    attributes:
+      label: Problem Description / Scenario
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements/Inputs
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: "--- \n # Design Proposals"
+
+  - type: textarea
+    id: proposal_1
+    attributes:
+      label: "Design Proposal 1"
+      description: "Fill in all technical details for the primary proposal. (Give NA if a section is empty)"
+      value: |
+        ### Target Architecture
+        [Describe architecture and drag/drop images here]
+
+        ### Impact Analysis
+        1. Impacted Product Variants: 
+        2. Limitations and Assumptions: 
+        3. Interface Dependencies:
+        
+        | Interface Name | Purpose | Sender/Receiver |
+        | -------------- | ------- | --------------- |
+        |                |         |                 |
+        
+        4. Feature chain impact: 
+        5. Product level Impact: 
+        6. Portability of the Feature: 
+        7. μC Resources required: 
+        8. Expected risks or deviations: 
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal_2
+    attributes:
+      label: "Design Proposal 2 (Optional)"
+      description: "Provide details if an alternative design exists."
+      value: |
+        ### Target Architecture
+        [Describe architecture and drag/drop images here]
+
+        ### Impact Analysis
+        1. Impacted Product Variants: 
+        2. Limitations and Assumptions: 
+        3. Interface Dependencies:
+        
+        | Interface Name | Purpose | Sender/Receiver |
+        | -------------- | ------- | --------------- |
+        |                |         |                 |
+        
+        4. Feature chain impact: 
+        5. Product level Impact: 
+        6. Portability of the Feature: 
+        7. μC Resources required: 
+        8. Expected risks or deviations: 
+
+  - type: textarea
+    id: proposal_3
+    attributes:
+      label: "Design Proposal 3 (Optional)"
+      description: "Provide details if a third design option exists."
+      value: |
+        ### Target Architecture
+        [Describe architecture and drag/drop images here]
+
+        ### Impact Analysis
+        1. Impacted Product Variants: 
+        2. Limitations and Assumptions: 
+        3. Interface Dependencies:
+        
+        | Interface Name | Purpose | Sender/Receiver |
+        | -------------- | ------- | --------------- |
+        |                |         |                 |
+        
+        4. Feature chain impact: 
+        5. Product level Impact: 
+        6. Portability of the Feature: 
+        7. μC Resources required: 
+        8. Expected risks or deviations: 
+
+  - type: markdown
+    attributes:
+      value: "--- \n # CCB Decision (Board Use Only)"
+
+  - type: textarea
+    id: decision
+    attributes:
+      label: Decision & Rationale
+      placeholder: "Give NA if empty"
+
+  - type: input
+    id: presenters
+    attributes:
+      label: Presenters
+
+  - type: input
+    id: participants
+    attributes:
+      label: Participants
+
+  - type: input
+    id: date
+    attributes:
+      label: Date
+      placeholder: "YYYY-MM-DD"
