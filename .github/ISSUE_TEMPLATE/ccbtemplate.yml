@@ -46,13 +46,14 @@ body:
     attributes:
       value: "--- \n # Design Proposals"
 
-  - type: textarea
+ - type: textarea
     id: proposal
     attributes:
-      label: "Design Proposal "
-      description: "Fill in all technical details for the proposal(s).
-      1. Give NA if a section is irrelevant.
-      2. In case of more than one proposals, please append a new 'Impact Analysis' section"
+      label: "Design Proposal"
+      description: |
+        Fill in all technical details for the proposal(s):
+        1. Give NA if a section is irrelevant.
+        2. In case of more than one proposals, please append a new 'Impact Analysis' section.
       value: |
         ### Target Architecture
         [Describe architecture and drag/drop images here]
