@@ -1,0 +1,112 @@
+name: VM-Brakes Architecture Change Control Board (ARCH-CCB) Request
+description: Propose a change.
+title: "[ARCH-CCB]: "
+labels: ["arch-ccb-pending"]
+body:
+  - type: dropdown
+    id: category
+    attributes:
+      label: Change Category
+      description: Categorise the change as Method change or a Feature Change.
+      options:
+        - Method Change
+        - Feature Change
+    validations:
+      required: true
+
+  - type: input
+    id: feature_name
+    attributes:
+      label: Feature Name/Topic
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem_description
+    attributes:
+      label: Problem Description / Scenario
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements/Inputs
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: "--- \n # Design Proposals"
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: "Design Proposal "
+      description: "Fill in all technical details for the proposal(s). (1. Give NA if a section is irrelevant. 2. In case of more than one proposals, please append a new "Impact Analysis" section)"
+      value: |
+        ### Target Architecture
+        [Describe architecture and drag/drop images here]
+
+        ### Impact Analysis
+        1. Impacted Product Variants: 
+        2. Limitations and Assumptions: 
+        3. Interface Dependencies:
+        
+        | Interface Name | Purpose | Sender/Receiver |
+        | -------------- | ------- | --------------- |
+        |                |         |                 |
+        
+        4. Feature chain impact: 
+        5. Product level Impact: 
+        6. Portability of the Feature: 
+        7. μC Resources required: 
+        8. Expected risks or deviations: 
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: "--- \n # ARCH-CCB Decision (Board Use Only)"
+
+  - type: textarea
+    id: decision
+    attributes:
+      label: Decision & Rationale
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_information
+    attributes:
+      label: Additional Information
+      placeholder: "Enter any limitation, assumptions etc..."
+
+  - type: input
+    id: presenters
+    attributes:
+      label: Presenters
+    validations:
+      required: true
+
+  - type: input
+    id: participants
+    attributes:
+      label: Participants
+    validations:
+      required: true
+
+  - type: input
+    id: date
+    attributes:
+      label: Date
+      placeholder: "YYYY-MM-DD"
+    validations:
+      required: true
