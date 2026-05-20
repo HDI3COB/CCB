@@ -46,7 +46,7 @@ body:
     attributes:
       value: "--- \n # Design Proposals"
 
- - type: textarea
+  - type: textarea
     id: proposal
     attributes:
       label: "Design Proposal"
