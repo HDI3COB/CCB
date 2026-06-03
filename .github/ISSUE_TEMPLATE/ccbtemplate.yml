@@ -3,7 +3,7 @@ description: Propose a change.
 title: "[ARCH-CCB]: "
 labels: ["arch-ccb-pending"]
 body:
-  type: dropdown
+  - type: dropdown
     id: category
     attributes:
       label: Change Category
@@ -42,7 +42,7 @@ body:
     validations:
       required: true
 
-   - type: markdown
+  - type: markdown
     attributes:
       value: |
         ---
@@ -79,7 +79,8 @@ body:
 
   - type: markdown
     attributes:
-      value: # ARCH-CCB Decision (Board Use Only)"
+      value: |
+         ---  # ARCH-CCB Decision (Board Use Only)"
 
   - type: textarea
     id: decision
