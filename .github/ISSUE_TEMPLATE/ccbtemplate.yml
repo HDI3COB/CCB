@@ -3,7 +3,7 @@ description: Propose a change.
 title: "[ARCH-CCB]: "
 labels: ["arch-ccb-pending"]
 body:
-  - type: dropdown
+  type: dropdown
     id: category
     attributes:
       label: Change Category
