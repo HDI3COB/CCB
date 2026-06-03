@@ -81,7 +81,7 @@ body:
     attributes:
       value: |
          ---  
-          # ARCH-CCB Decision (Board Use Only)"
+          ## ARCH-CCB Decision (Board Use Only)
 
   - type: textarea
     id: decision
