@@ -42,10 +42,11 @@ body:
     validations:
       required: true
 
-  - type: markdown
+   - type: markdown
     attributes:
-      value: "---" |  
-            #Design Proposals
+      value: |
+        ---
+        # Design Proposals
 
   - type: textarea
     id: proposal
